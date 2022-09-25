@@ -9,14 +9,17 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-navigation/bottom-tabs": "^6.3.3",
     "@react-navigation/native": "^6.0.12",
     "@react-navigation/native-stack": "^6.8.0",
     "expo": "~46.0.9",
+    "expo-image-picker": "^13.3.1",
     "expo-status-bar": "~1.4.0",
     "firebase": "9.6.7",
     "formik": "^2.2.9",
     "react": "18.0.0",
+    "react-dom": "^18.2.0",
     "react-native": "0.69.5",
     "react-native-elements": "^3.4.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
@@ -24,6 +27,7 @@
     "react-native-screens": "~3.15.0",
     "react-native-toast-message": "^2.1.5",
     "react-native-vector-icons": "^9.2.0",
+    "react-native-web": "~0.18.7",
     "yup": "^0.32.11"
   },
   "devDependencies": {
