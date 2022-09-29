@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Alert } from 'react-native';
 import {Icon, Avatar} from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
+import {getStorage, ref, uploadBytes, getDownloadURL} from "firebase/storage";
+import {v4 as uuid} from "uuid";
 import {styles} from "./UploadImagesForm.styles"
 
 
@@ -17,9 +19,23 @@ const openGallery = async () => {//funcion para abrir galaria de imagenes
    });
 
    if(!result.cancelled) {
-    console.log("Upload Image");
+    uploadImage(result.uri);
    }
   };
+
+  const uploadImage = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    const storage = getStorage();
+    const storageRef = ref(storage,`restaurants/${uuid()}`);
+
+    uploadBytes(storageRef, blob).then((snapshot) =>{
+      console.log(snapshot);
+    })
+  }
+
+
   return (
     <>
       <View style={styles.viewImage}>
