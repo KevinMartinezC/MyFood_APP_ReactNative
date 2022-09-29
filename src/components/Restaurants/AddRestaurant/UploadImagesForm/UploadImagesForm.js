@@ -1,14 +1,18 @@
-import React from 'react';
-import { View, Text, Alert } from 'react-native';
+import React,{ useState} from 'react';
+import {  Text, Alert,ScrollView } from 'react-native';
 import {Icon, Avatar} from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import {getStorage, ref, uploadBytes, getDownloadURL} from "firebase/storage";
 import {v4 as uuid} from "uuid";
+import {map} from "lodash";
+import {LoadingModal} from "../../../shared";
 import {styles} from "./UploadImagesForm.styles"
 
 
 export function UploadImagesForm( props ) {
   const {formik} = props;
+
+  const [isLoading,setIsLoading] = useState(false);
 
 const openGallery = async () => {//funcion para abrir galaria de imagenes
    const result = await ImagePicker.launchImageLibraryAsync({
@@ -19,6 +23,7 @@ const openGallery = async () => {//funcion para abrir galaria de imagenes
    });
 
    if(!result.cancelled) {
+    setIsLoading(true);
     uploadImage(result.uri);
    }
   };
@@ -31,14 +36,25 @@ const openGallery = async () => {//funcion para abrir galaria de imagenes
     const storageRef = ref(storage,`restaurants/${uuid()}`);
 
     uploadBytes(storageRef, blob).then((snapshot) =>{
-      console.log(snapshot);
-    })
-  }
+      updatePhotosRestaurants(snapshot.metadata.fullPath)
+    });
+  };
+
+  const updatePhotosRestaurants = async (imagePath) =>{ //funcion para setear y obtoner la url de la imagen que guardamos en firestore
+      const storage = getStorage();
+      const imageRef = ref(storage,imagePath); //para buscar referencia imagePath en el storage
+
+      const imageUrl = await getDownloadURL(imageRef);
+
+      formik.setFieldValue("images", [...formik.values.images,imageUrl]);//de esta manera estamos obteniendo las images guardadas actuales y le pasamos las nuevas
+
+      setIsLoading(false);
+  };
 
 
   return (
     <>
-      <View style={styles.viewImage}>
+      <ScrollView style={styles.viewImage} horizontal showsHorizontalScrollIndicator={false}>
         <Icon
           type="material-community"
           name="camera"
@@ -46,7 +62,17 @@ const openGallery = async () => {//funcion para abrir galaria de imagenes
           containerStyle={styles.containerIcon}
           onPress={openGallery}
         />
-      </View>
+        {map(formik.values.images, (image) =>(
+          <Avatar
+            key={image}
+            source={{uri:image}}
+            containerStyle={styles.imageStyle}
+          />
+        ))}
+      
+      </ScrollView>
+      <Text style={styles.error}>{formik.errors.images}</Text>
+      <LoadingModal show={isLoading} text="Subiendo imagen"/>
     </>
   )
 }
