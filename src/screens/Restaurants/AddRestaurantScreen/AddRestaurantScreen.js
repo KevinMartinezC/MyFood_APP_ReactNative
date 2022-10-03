@@ -1,24 +1,43 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { Button } from "react-native-elements";
 import {useFormik} from "formik";
-import {InfoForm} from "../../../components/Restaurants/AddRestaurant";
+import {v4 as uuid} from "uuid";
+import {doc, setDoc} from "firebase/firestore";
+import { useNavigation } from '@react-navigation/native';
+import {db} from "../../../utils";
+import {InfoForm, UploadImagesForm,ImageRestaurant} from "../../../components/Restaurants/AddRestaurant";
 import {initialValues, validationSchema} from "./AddRestaurantScreen.data";
 import {styles} from "./AddRestaurantScreen.styles";
 
+
 export function AddRestaurantScreen() {
+  const navigation = useNavigation();
+
   const formik = useFormik({
     initialValues: initialValues(),
     validationSchema: validationSchema(),
     validateOnChange: false,
     onSubmit: async (formValue) => {
-      console.log(formValue);
+        try {
+          const newData = formValue;
+          newData.id = uuid();
+          newData.ceratedAt = new Date();
+          
+          const myDb = doc(db,"restaurants",newData.id);
+          await setDoc(myDb,newData);
+          navigation.goBack();
+
+        } catch (error) {
+          console.log(error);
+        }
     }
   })
   return (
-    <View>
-     <InfoForm formik={formik}/> 
-    
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <ImageRestaurant formik={formik}/>
+      <InfoForm formik={formik}/> 
+      <UploadImagesForm formik={formik}/>
 
      <Button 
         title="Crear restaurante" 
@@ -26,6 +45,6 @@ export function AddRestaurantScreen() {
         onPress={formik.handleSubmit}
         loading={formik.isSubmitting}
         />
-    </View>
+    </ScrollView>
   )
 }
