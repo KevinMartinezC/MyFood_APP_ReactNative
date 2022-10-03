@@ -4,7 +4,7 @@ import {Icon, Avatar} from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import {getStorage, ref, uploadBytes, getDownloadURL} from "firebase/storage";
 import {v4 as uuid} from "uuid";
-import {map} from "lodash";
+import {map, filter} from "lodash";
 import {LoadingModal} from "../../../shared";
 import {styles} from "./UploadImagesForm.styles"
 
@@ -43,12 +43,33 @@ const openGallery = async () => {//funcion para abrir galaria de imagenes
   const updatePhotosRestaurants = async (imagePath) =>{ //funcion para setear y obtoner la url de la imagen que guardamos en firestore
       const storage = getStorage();
       const imageRef = ref(storage,imagePath); //para buscar referencia imagePath en el storage
-
+      
       const imageUrl = await getDownloadURL(imageRef);
 
       formik.setFieldValue("images", [...formik.values.images,imageUrl]);//de esta manera estamos obteniendo las images guardadas actuales y le pasamos las nuevas
 
       setIsLoading(false);
+  };
+
+  const removeImage = (img) => {
+      Alert.alert(
+        "Eliminar Imagen",
+        "¿Estás seguro de eliminar esta imagen?",
+        [
+          {
+            text: "Cancelar",
+            style:"cancel"
+          },
+          {
+            text: "Eliminar",
+            onPress: () => {
+              const result = filter(formik.values.images,(image) => image !== img);//recorrer array y por cada interaction tomarme la imagen seleccionada y devolverme las diferentes a esa
+              formik.setFieldValue("images",result);
+            },
+          },
+        ],
+        {cancelable: false}
+      );
   };
 
 
@@ -67,6 +88,7 @@ const openGallery = async () => {//funcion para abrir galaria de imagenes
             key={image}
             source={{uri:image}}
             containerStyle={styles.imageStyle}
+            onPress={() => removeImage(image)}
           />
         ))}
       
