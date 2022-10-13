@@ -65,7 +65,7 @@ export function BtnReviewForm(props) {
           icon={{
             type: "material-community",
             name: "square-edit-outline",
-            color: "#00a680",
+            color: "#E02E00",
           }}
           buttonStyle={styles.button}
           titleStyle={styles.btnText}
@@ -73,7 +73,7 @@ export function BtnReviewForm(props) {
         />
       ) : (
         <Text style={styles.text} onPress={goToLogin}>
-          Para escribir una opinión es necesario estas logeado{" "}
+          Para escribir una opinión es necesario estar logeado{" "}
           <Text style={styles.textClick}>pulsa AQUÍ para iniciar sesión</Text>
         </Text>
       )}
