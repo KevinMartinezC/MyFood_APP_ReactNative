@@ -4,7 +4,7 @@ import {Icon} from "react-native-elements";
 import {getAuth} from "firebase/auth";
 import {doc, setDoc,getDocs, collection, query, where, deleteDoc} from "firebase/firestore";
 import {v4 as uuid} from "uuid";
-import {size} from "lodash";
+import {size,forEach} from "lodash";
 import {db} from "../../../utils";
 import {styles} from "./BtnFavorite.styles";
 import { async } from '@firebase/util';
@@ -13,6 +13,7 @@ import { async } from '@firebase/util';
 export  function BtnFavorite(props) {
     const {idRestaurant} = props;
     const [isFavorite, setIsFavorite] = useState(undefined);
+    const [isReload, setIsReload] = useState(false);
     const auth = getAuth()
 
 
@@ -27,8 +28,9 @@ export  function BtnFavorite(props) {
        }
 
       })();
-    }, [idRestaurant])
+    }, [idRestaurant, isReload])
     
+    const onReload = () => setIsReload((prevState) => !prevState)
     const getFavorites = async () => {
         const q = query(
             collection(db, "favorites"),
@@ -51,14 +53,23 @@ export  function BtnFavorite(props) {
            };
 
            await setDoc(doc(db, "favorites", idFavorite), data);
-           
+           onReload();
         } catch (error) {
             console.log(error);
         }
     }
 
-    const removeFavorite = () => {
-        console.log("Eliminar favorito")
+    const removeFavorite =  async () => {
+        try {
+            const response = await getFavorites()
+
+            forEach(response, async (item) => {
+                await deleteDoc(doc(db, "favorites", item.id));
+            })
+            onReload();
+        } catch (error) {
+            console.log(error);
+        }
     };
 
   return (
