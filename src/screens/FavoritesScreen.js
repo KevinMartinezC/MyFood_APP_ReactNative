@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text } from 'react-native';
+import { Text, ScrollView } from 'react-native';
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import {doc, getDoc, collection, query, where, onSnapshot} from "firebase/firestore";
-import {size} from "lodash";
+import {size, map} from "lodash";
 import {db} from "../utils";
-import { UserNotLogged, NotFoundRestaurants} from "../components/Favorites";
+import { UserNotLogged, NotFoundRestaurants, RestaurantFavorites} from "../components/Favorites";
 import {Loading} from "../components/shared";
 
 
@@ -49,10 +49,12 @@ export  function FavoritesScreen() {
   if(!restaurants) return <Loading show text="Cargando..."/>
 
   if(size(restaurants) === 0) return <NotFoundRestaurants/>
-  
+
   return (
-    <View>
-      <Text>FavoritesScreen</Text>
-    </View>
+    <ScrollView>
+      {map(restaurants, (restaurant)=>(
+        <RestaurantFavorites key={restaurant.id} restaurant={restaurant}/>
+      ))}
+    </ScrollView>
   )
 }
