@@ -6,6 +6,7 @@ import {size, map} from "lodash";
 import {db} from "../utils";
 import { UserNotLogged, NotFoundRestaurants, RestaurantFavorites} from "../components/Favorites";
 import {Loading} from "../components/shared";
+import { async } from '@firebase/util';
 
 
 
@@ -16,35 +17,36 @@ export  function FavoritesScreen() {
 
 
   useEffect(() => {
-   onAuthStateChanged(auth, (user) =>{
+   onAuthStateChanged(auth, (user) => {
     setHasLogged(user ? true : false);
    })
   }, []);
-
-
-  useEffect(() => {
+  
+  async function getUser(){
     const q = query(
       collection(db, "favorites"),
-      where("idUser", "==", auth.currentUser.uid)
-    )
-    onSnapshot( q, async (snapshot) => {
-      let restaurantArray = [];
-      for await (const item of snapshot.docs){
+      where("idUser", "==" , auth.currentUser.uid)
+     );
+  
+     onSnapshot(q, async (snapshot) => {
+      let restaurantArray = []
+      for await (const item of snapshot.docs ){
         const data = item.data();
-        const docRef = doc(db,"restaurants", data.idRestaurant);
+        const docRef = doc(db, "restaurants", data.idRestaurant)
         const docSnap = await getDoc(docRef);
         const newData = docSnap.data();
         newData.idFavorite = data.id
-
         restaurantArray.push(newData);
       }
-      setRestaurants(restaurantArray)
-    })
-  }, []);
-  
- 
+      setRestaurants(restaurantArray);
+     })
+  }
 
-  if(!hasLogged) return <UserNotLogged/>
+  if(!hasLogged){
+    return <UserNotLogged/>
+  } else{
+    getUser();
+  }
 
   if(!restaurants) return <Loading show text="Cargando..."/>
 
