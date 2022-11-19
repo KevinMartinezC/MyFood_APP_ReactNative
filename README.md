@@ -8,7 +8,7 @@
 * [Git hub] https://github.com/ - Control de versiones del software.
 * [Figma] https://www.figma.com/?fuid= - Herramienta para creación de mockups.
 
-## Miembros del equipo de desarrollo DPS441 -Proyecto SaborcitoSV 💻✒️
+## Miembros del equipo de desarrollo -Proyecto My Food App 💻✒️
 
 * ### Kevin Adonay Martínez Cerón - Programación, diseño, lógica y manuales
 * ### Stanley Adonay Mejia Amaya  - Programación, diseño, lógica y manuales 
